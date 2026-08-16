@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: wrist-store
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+    startCommand: gunicorn wrist_stores.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: wrist-store-db
+          property: connectionString
+    databases:
+      - name: wrist-store-db
+        databaseName: wrist_store
+        user: wrist_store_user
